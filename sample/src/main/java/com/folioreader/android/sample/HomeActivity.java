@@ -108,7 +108,7 @@ public class HomeActivity extends AppCompatActivity
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ArrayList<HighLight> highlightList = null;
+                List<HighlightData> highlightList = null;
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
                     highlightList = objectMapper.readValue(
@@ -120,12 +120,12 @@ public class HomeActivity extends AppCompatActivity
                 }
 
                 if (highlightList == null) {
-                    folioReader.saveReceivedHighLights(highlightList, new OnSaveHighlight() {
+                    /*folioReader.saveReceivedHighLights(highlightList, new OnSaveHighlight() {
                         @Override
                         public void onFinished() {
                             //You can do anything on successful saving highlight list
                         }
-                    });
+                    });*/
                 }
             }
         }).start();
