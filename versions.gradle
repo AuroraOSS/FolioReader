@@ -21,7 +21,7 @@ versions.material = "1.2.1"
 
 versions.retrofit = "2.5.0"
 versions.jackson = "2.11.0"
-versions.gson = "2.8.5"
+versions.gson = "2.8.6"
 
 versions.lifecycle = "2.2.0"
 

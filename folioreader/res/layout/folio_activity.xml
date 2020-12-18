@@ -5,7 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.folioreader.ui.activity.FolioActivity"
     tools:menu="@menu/menu_main">
 
     <com.folioreader.ui.view.DirectionalViewpager
@@ -33,7 +32,5 @@
             app:contentInsetLeft="0dp"
             app:contentInsetStart="0dp"
             app:contentInsetStartWithNavigation="0dp" />
-
     </com.folioreader.ui.view.FolioAppBarLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

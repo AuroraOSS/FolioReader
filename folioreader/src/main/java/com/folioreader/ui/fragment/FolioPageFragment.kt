@@ -17,14 +17,13 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.webkit.*
-import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.folioreader.Config
 import com.folioreader.FolioReader
 import com.folioreader.R
+import com.folioreader.databinding.FolioPageFragmentBinding
 import com.folioreader.mediaoverlay.MediaController
 import com.folioreader.mediaoverlay.MediaControllerCallbacks
 import com.folioreader.model.HighLight
@@ -38,9 +37,6 @@ import com.folioreader.ui.base.HtmlTask
 import com.folioreader.ui.base.HtmlTaskCallback
 import com.folioreader.ui.base.HtmlUtil
 import com.folioreader.ui.view.FolioWebView
-import com.folioreader.ui.view.LoadingView
-import com.folioreader.ui.view.VerticalSeekbar
-import com.folioreader.ui.view.WebViewPager
 import com.folioreader.util.AppUtil
 import com.folioreader.util.HighlightUtil
 import com.folioreader.util.UiUtil
@@ -57,6 +53,8 @@ import java.util.regex.Pattern
  */
 class FolioPageFragment : Fragment(),
     HtmlTaskCallback, MediaControllerCallbacks, FolioWebView.SeekBarListener {
+
+    private lateinit var B: FolioPageFragmentBinding
 
     companion object {
 
@@ -98,15 +96,8 @@ class FolioPageFragment : Fragment(),
     private var outState: Bundle? = null
     private var savedInstanceState: Bundle? = null
 
-    private lateinit var rootView: View
-    private lateinit var loadingView: LoadingView
-    private lateinit var webViewPager: WebViewPager
-
     public lateinit var webview: FolioWebView
 
-    private var mScrollSeekbar: VerticalSeekbar? = null
-    private var mPagesLeftTextView: TextView? = null
-    private var mMinutesLeftTextView: TextView? = null
     private var mActivityCallback: FolioActivityCallback? = null
 
     private var mTotalMinutes: Int = 0
@@ -169,11 +160,18 @@ class FolioPageFragment : Fragment(),
         highlightStyle =
             HighlightImpl.HighlightStyle.classForStyle(HighlightImpl.HighlightStyle.Normal)
 
-        rootView = inflater.inflate(R.layout.folio_page_fragment, container, false)
-        loadingView = rootView.findViewById(R.id.loadingView)
 
-        mPagesLeftTextView = rootView.findViewById<View>(R.id.pagesLeft) as TextView
-        mMinutesLeftTextView = rootView.findViewById<View>(R.id.minutesLeft) as TextView
+        B = FolioPageFragmentBinding.bind(
+            inflater.inflate(
+                R.layout.folio_page_fragment,
+                container,
+                false
+            )
+        )
+
+        B.folioWebView.setParentFragment(this)
+
+        webview = B.folioWebView
 
         mConfig = AppUtil.getSavedConfig(context)
 
@@ -182,7 +180,7 @@ class FolioPageFragment : Fragment(),
         initWebView()
         updatePagesLeftTextBg()
 
-        return rootView
+        return B.root
     }
 
     /**
@@ -254,10 +252,10 @@ class FolioPageFragment : Fragment(),
             getLastReadLocator()
 
         if (isAdded) {
-            webview.dismissPopupWindow()
-            webview.initViewTextSelection()
-            loadingView!!.updateTheme()
-            loadingView!!.show()
+            B.folioWebView.dismissPopupWindow()
+            B.folioWebView.initViewTextSelection()
+            B.loadingView.updateTheme()
+            B.loadingView.show()
             mIsPageReloaded = true
             setHtml(true)
             updatePagesLeftTextBg()
@@ -285,8 +283,8 @@ class FolioPageFragment : Fragment(),
 
         if (!TextUtils.isEmpty(href) && href.indexOf('#') != -1) {
             mAnchorId = href.substring(href.lastIndexOf('#') + 1)
-            if (loadingView != null && loadingView!!.visibility != View.VISIBLE) {
-                loadingView!!.show()
+            if (B.loadingView.visibility != View.VISIBLE) {
+                B.loadingView.show()
                 webview.loadUrl(String.format(getString(R.string.go_to_anchor), mAnchorId))
                 mAnchorId = null
             }
@@ -341,40 +339,38 @@ class FolioPageFragment : Fragment(),
     }
 
     fun scrollToLast() {
+        if (::B.isInitialized) {
+            val isPageLoading = B.loadingView.visibility == View.VISIBLE
+            Log.v(LOG_TAG, "-> scrollToLast -> isPageLoading = $isPageLoading")
 
-        val isPageLoading = loadingView == null || loadingView!!.visibility == View.VISIBLE
-        Log.v(LOG_TAG, "-> scrollToLast -> isPageLoading = $isPageLoading")
+            if (!isPageLoading) {
+                B.loadingView.show()
+                webview.loadUrl("javascript:scrollToLast()")
+            }
 
-        if (!isPageLoading) {
-            loadingView!!.show()
-            webview.loadUrl("javascript:scrollToLast()")
+            B.folioWebView.dismissPopupWindow()
         }
     }
 
     fun scrollToFirst() {
-        var isPageLoading = false
-        if (::loadingView.isInitialized) {
-            isPageLoading = loadingView.visibility == View.VISIBLE
+        if (::B.isInitialized) {
+            val isPageLoading: Boolean = B.loadingView.visibility == View.VISIBLE
             Log.v(LOG_TAG, "-> scrollToFirst -> isPageLoading = $isPageLoading")
-        }
 
-        if (!isPageLoading) {
-            if (::loadingView.isInitialized) {
-                loadingView.show()
+            if (!isPageLoading) {
+
+                B.loadingView.show()
+
+                B.folioWebView.loadUrl("javascript:scrollToFirst()")
+
             }
-            if (::webview.isInitialized) {
-                webview.loadUrl("javascript:scrollToFirst()")
-            }
+
+            B.folioWebView.dismissPopupWindow()
         }
     }
 
     @SuppressLint("JavascriptInterface", "SetJavaScriptEnabled")
     private fun initWebView() {
-        val webViewLayout = rootView.findViewById<FrameLayout>(R.id.webViewLayout)
-        webview = webViewLayout.findViewById(R.id.folioWebView)
-        webview.setParentFragment(this)
-        webViewPager = webViewLayout.findViewById(R.id.webViewPager)
-
         if (activity is FolioActivityCallback)
             webview.setFolioActivityCallback((activity as FolioActivityCallback?)!!)
 
@@ -383,7 +379,7 @@ class FolioPageFragment : Fragment(),
             val height =
                 Math.floor((webview.contentHeight * webview.scale).toDouble()).toInt()
             val webViewHeight = webview.measuredHeight
-            mScrollSeekbar!!.maximum = height - webViewHeight
+            B.scrollSeekbar.maximum = height - webViewHeight
         }
 
         webview.settings.javaScriptEnabled = true
@@ -394,14 +390,14 @@ class FolioPageFragment : Fragment(),
 
         webview.addJavascriptInterface(this, "Highlight")
         webview.addJavascriptInterface(this, "FolioPageFragment")
-        webview.addJavascriptInterface(webViewPager, "WebViewPager")
-        webview.addJavascriptInterface(loadingView, "LoadingView")
+        webview.addJavascriptInterface(B.webViewPager, "WebViewPager")
+        webview.addJavascriptInterface(B.loadingView, "LoadingView")
         webview.addJavascriptInterface(webview, "FolioWebView")
 
         webview.setScrollListener(object : FolioWebView.ScrollListener {
             override fun onScrollChange(percent: Int) {
 
-                mScrollSeekbar!!.setProgressAndThumb(percent)
+                B.scrollSeekbar.setProgressAndThumb(percent)
                 updatePagesLeftText(percent)
             }
         })
@@ -456,7 +452,7 @@ class FolioPageFragment : Fragment(),
                         webview.loadUrl("javascript:scrollToLast()")
                     } else {
                         // Make loading view invisible for all other fragments
-                        loadingView!!.hide()
+                        B.loadingView!!.hide()
                     }
                 }
 
@@ -495,7 +491,7 @@ class FolioPageFragment : Fragment(),
                     Log.v(LOG_TAG, "-> onPageFinished -> readLocator -> " + cfi!!)
                     webview.loadUrl(String.format(getString(R.string.callScrollToCfi), cfi))
                 } else {
-                    loadingView!!.hide()
+                    B.loadingView!!.hide()
                 }
 
             } else {
@@ -505,7 +501,7 @@ class FolioPageFragment : Fragment(),
                     webview.loadUrl("javascript:scrollToLast()")
                 } else {
                     // Make loading view invisible for all other fragments
-                    loadingView!!.hide()
+                    B.loadingView!!.hide()
                 }
             }
         }
@@ -665,15 +661,14 @@ class FolioPageFragment : Fragment(),
     }
 
     private fun setupScrollBar() {
-        UiUtil.setColorIntToDrawable(mConfig!!.themeColor, mScrollSeekbar!!.progressDrawable)
+        UiUtil.setColorIntToDrawable(mConfig!!.themeColor, B.scrollSeekbar!!.progressDrawable)
         val thumbDrawable = ContextCompat.getDrawable(activity!!, R.drawable.icons_sroll)
         UiUtil.setColorIntToDrawable(mConfig!!.themeColor, thumbDrawable!!)
-        mScrollSeekbar!!.thumb = thumbDrawable
+        B.scrollSeekbar!!.thumb = thumbDrawable
     }
 
     private fun initSeekbar() {
-        mScrollSeekbar = rootView.findViewById<View>(R.id.scrollSeekbar) as VerticalSeekbar
-        mScrollSeekbar!!.progressDrawable
+        B.scrollSeekbar!!.progressDrawable
             .setColorFilter(
                 resources
                     .getColor(R.color.default_theme_accent_color),
@@ -683,11 +678,9 @@ class FolioPageFragment : Fragment(),
 
     private fun updatePagesLeftTextBg() {
         if (mConfig!!.isNightMode) {
-            rootView.findViewById<View>(R.id.indicatorLayout)
-                .setBackgroundColor(Color.parseColor("#131313"))
+            B.indicatorLayout.setBackgroundColor(Color.parseColor("#131313"))
         } else {
-            rootView.findViewById<View>(R.id.indicatorLayout)
-                .setBackgroundColor(Color.WHITE)
+            B.indicatorLayout.setBackgroundColor(Color.WHITE)
         }
     }
 
@@ -723,8 +716,8 @@ class FolioPageFragment : Fragment(),
                 minutesRemainingStr = getString(R.string.less_than_minute)
             }
 
-            mMinutesLeftTextView!!.text = minutesRemainingStr
-            mPagesLeftTextView!!.text = pagesRemainingStr
+            B.minutesLeft.text = minutesRemainingStr
+            B.pagesLeft.text = pagesRemainingStr
         } catch (exp: java.lang.ArithmeticException) {
             Log.e("divide error", exp.toString())
         } catch (exp: IllegalStateException) {
@@ -737,7 +730,7 @@ class FolioPageFragment : Fragment(),
         mFadeInAnimation = AnimationUtils.loadAnimation(activity, R.anim.fadein)
         mFadeInAnimation!!.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {
-                mScrollSeekbar!!.visibility = View.VISIBLE
+                B.scrollSeekbar!!.visibility = View.VISIBLE
             }
 
             override fun onAnimationEnd(animation: Animation) {
@@ -755,7 +748,7 @@ class FolioPageFragment : Fragment(),
             }
 
             override fun onAnimationEnd(animation: Animation) {
-                mScrollSeekbar!!.visibility = View.INVISIBLE
+                B.scrollSeekbar!!.visibility = View.INVISIBLE
             }
 
             override fun onAnimationRepeat(animation: Animation) {
@@ -765,14 +758,14 @@ class FolioPageFragment : Fragment(),
     }
 
     override fun fadeInSeekBarIfInvisible() {
-        if (mScrollSeekbar!!.visibility == View.INVISIBLE || mScrollSeekbar!!.visibility == View.GONE) {
-            mScrollSeekbar!!.startAnimation(mFadeInAnimation)
+        if (B.scrollSeekbar!!.visibility == View.INVISIBLE || B.scrollSeekbar!!.visibility == View.GONE) {
+            B.scrollSeekbar!!.startAnimation(mFadeInAnimation)
         }
     }
 
     fun fadeOutSeekBarIfVisible() {
-        if (mScrollSeekbar!!.visibility == View.VISIBLE) {
-            mScrollSeekbar!!.startAnimation(mFadeOutAnimation)
+        if (B.scrollSeekbar!!.visibility == View.VISIBLE) {
+            B.scrollSeekbar!!.startAnimation(mFadeOutAnimation)
         }
     }
 
@@ -879,8 +872,8 @@ class FolioPageFragment : Fragment(),
     fun scrollToHighlightId(highlightId: String) {
         this.highlightId = highlightId
 
-        if (loadingView != null && loadingView!!.visibility != View.VISIBLE) {
-            loadingView!!.show()
+        if (B.loadingView.visibility != View.VISIBLE) {
+            B.loadingView.show()
             webview.loadUrl(String.format(getString(R.string.go_to_highlight), highlightId))
             this.highlightId = null
         }
@@ -890,8 +883,8 @@ class FolioPageFragment : Fragment(),
         Log.v(LOG_TAG, "-> highlightSearchLocator")
         this.searchLocatorVisible = searchLocator
 
-        if (loadingView != null && loadingView!!.visibility != View.VISIBLE) {
-            loadingView!!.show()
+        if (B.loadingView.visibility != View.VISIBLE) {
+            B.loadingView.show()
             val callHighlightSearchLocator = String.format(
                 getString(R.string.callHighlightSearchLocator),
                 searchLocatorVisible?.locations?.cfi
