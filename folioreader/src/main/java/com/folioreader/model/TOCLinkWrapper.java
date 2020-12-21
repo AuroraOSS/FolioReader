@@ -1,6 +1,7 @@
 package com.folioreader.model;
 
 import com.folioreader.util.MultiLevelExpIndListAdapter;
+
 import org.readium.r2.shared.Link;
 
 import java.util.ArrayList;
@@ -79,12 +80,12 @@ public class TOCLinkWrapper implements MultiLevelExpIndListAdapter.ExpIndData {
         mIsGroup = value;
     }
 
+    public int getGroupSize() {
+        return mGroupSize;
+    }
+
     @Override
     public void setGroupSize(int groupSize) {
         mGroupSize = groupSize;
-    }
-
-    public int getGroupSize() {
-        return mGroupSize;
     }
 }

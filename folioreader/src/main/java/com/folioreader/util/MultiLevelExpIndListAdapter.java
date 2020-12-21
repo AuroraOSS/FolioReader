@@ -1,6 +1,7 @@
 package com.folioreader.util;
 
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.folioreader.model.TOCLinkWrapper;
 
 import java.util.ArrayList;
@@ -43,60 +44,6 @@ public abstract class MultiLevelExpIndListAdapter extends RecyclerView.Adapter {
      * e.g.: if the user click on item 6 then mGroups(item(6)) = {all items/groups below item 6}
      */
     private HashMap<ExpIndData, List<? extends ExpIndData>> mGroups;
-
-    /**
-     * Interface that every item to be displayed has to implement. If an object implements
-     * this interface it means that it can be expanded/collapsed and has a level of indentation.
-     * Note: some methods are commented out because they're not used here, but they should be
-     * implemented if you want your data to be expandable/collapsible and indentable.
-     * See MyComment in the sample app to see an example of how to implement this.
-     */
-    public interface ExpIndData {
-        /**
-         * @return The children of this item.
-         */
-        List<? extends ExpIndData> getChildren();
-
-        /**
-         * @return True if this item is a group.
-         */
-        boolean isGroup();
-
-        /**
-         * @param value True if this item is a group
-         */
-        void setIsGroup(boolean value);
-
-        /**
-         * @param groupSize Set the number of items in the group.
-         *                  Note: groups contained in other groups are counted just as one, not
-         *                  as the number of items that they contain.
-         */
-        void setGroupSize(int groupSize);
-
-        /** Note: actually this method is never called in MultiLevelExpIndListAdapter,
-         * that's why it's not strictly required that you implement this function and so
-         * it's commented out.
-         * @return The number of items in the group.
-         *         Note: groups contained in other groups are counted just as one, not
-         *               as the number of items that they contain.
-         */
-        //int getGroupSize();
-
-        /** Note: actually this method is never called in MultiLevelExpIndListAdapter,
-         * that's why it's not strictly required that you implement this function and so
-         * it's commented out.
-         * @return The level of indentation in the range [0, n-1]
-         */
-        //int getIndentation();
-
-        /** Note: actually this method is never called in MultiLevelExpIndListAdapter,
-         * that's why it's not strictly required that you implement this function and so
-         * it's commented out.
-         * @param indentation The level of indentation in the range [0, n-1]
-         */
-        //int setIndentation(int indentation);
-    }
 
     public MultiLevelExpIndListAdapter() {
         mData = new ArrayList<ExpIndData>();
@@ -351,5 +298,59 @@ public abstract class MultiLevelExpIndListAdapter extends RecyclerView.Adapter {
             collapseGroup(groupsNum.get(i));
         }
         mNotifyOnChange = notify;
+    }
+
+    /**
+     * Interface that every item to be displayed has to implement. If an object implements
+     * this interface it means that it can be expanded/collapsed and has a level of indentation.
+     * Note: some methods are commented out because they're not used here, but they should be
+     * implemented if you want your data to be expandable/collapsible and indentable.
+     * See MyComment in the sample app to see an example of how to implement this.
+     */
+    public interface ExpIndData {
+        /**
+         * @return The children of this item.
+         */
+        List<? extends ExpIndData> getChildren();
+
+        /**
+         * @return True if this item is a group.
+         */
+        boolean isGroup();
+
+        /**
+         * @param value True if this item is a group
+         */
+        void setIsGroup(boolean value);
+
+        /**
+         * @param groupSize Set the number of items in the group.
+         *                  Note: groups contained in other groups are counted just as one, not
+         *                  as the number of items that they contain.
+         */
+        void setGroupSize(int groupSize);
+
+        /** Note: actually this method is never called in MultiLevelExpIndListAdapter,
+         * that's why it's not strictly required that you implement this function and so
+         * it's commented out.
+         * @return The number of items in the group.
+         *         Note: groups contained in other groups are counted just as one, not
+         *               as the number of items that they contain.
+         */
+        //int getGroupSize();
+
+        /** Note: actually this method is never called in MultiLevelExpIndListAdapter,
+         * that's why it's not strictly required that you implement this function and so
+         * it's commented out.
+         * @return The level of indentation in the range [0, n-1]
+         */
+        //int getIndentation();
+
+        /** Note: actually this method is never called in MultiLevelExpIndListAdapter,
+         * that's why it's not strictly required that you implement this function and so
+         * it's commented out.
+         * @param indentation The level of indentation in the range [0, n-1]
+         */
+        //int setIndentation(int indentation);
     }
 }

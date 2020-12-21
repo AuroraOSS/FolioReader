@@ -4,13 +4,18 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.folioreader.Constants;
 import com.folioreader.model.HighLight;
 import com.folioreader.model.HighlightImpl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class HighLightTable {
@@ -18,6 +23,8 @@ public class HighLightTable {
 
     public static final String ID = "_id";
     public static final String COL_BOOK_ID = "bookId";
+    public static final String SQL_DROP = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    public static final String TAG = HighLightTable.class.getSimpleName();
     private static final String COL_CONTENT = "content";
     private static final String COL_DATE = "date";
     private static final String COL_TYPE = "type";
@@ -26,7 +33,6 @@ public class HighLightTable {
     private static final String COL_RANGY = "rangy";
     private static final String COL_NOTE = "note";
     private static final String COL_UUID = "uuid";
-
     public static final String SQL_CREATE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( " + ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT" + ","
             + COL_BOOK_ID + " TEXT" + ","
@@ -38,10 +44,6 @@ public class HighLightTable {
             + COL_RANGY + " TEXT" + ","
             + COL_UUID + " TEXT" + ","
             + COL_NOTE + " TEXT" + ")";
-
-    public static final String SQL_DROP = "DROP TABLE IF EXISTS " + TABLE_NAME;
-
-    public static final String TAG = HighLightTable.class.getSimpleName();
 
     public static ContentValues getHighlightContentValues(HighLight highLight) {
         ContentValues contentValues = new ContentValues();

@@ -27,12 +27,17 @@ class FolioSearchView : SearchView {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun init(componentName: ComponentName, config: Config) {
         Log.v(LOG_TAG, "-> init")
 
-        val searchManager: SearchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchManager: SearchManager =
+            context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
         setSearchableInfo(searchManager.getSearchableInfo(componentName))
         setIconifiedByDefault(false)
 
@@ -63,10 +68,25 @@ class FolioSearchView : SearchView {
         UiUtil.setEditTextHandleColor(searchAutoComplete, config.themeColor)
         searchAutoComplete.highlightColor = ColorUtils.setAlphaComponent(config.themeColor, 85)
         if (config.isNightMode) {
-            searchAutoComplete.setTextColor(ContextCompat.getColor(context, R.color.night_title_text_color))
-            searchAutoComplete.setHintTextColor(ContextCompat.getColor(context, R.color.night_text_color))
+            searchAutoComplete.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.night_title_text_color
+                )
+            )
+            searchAutoComplete.setHintTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.night_text_color
+                )
+            )
         } else {
-            searchAutoComplete.setHintTextColor(ContextCompat.getColor(context, R.color.edit_text_hint_color))
+            searchAutoComplete.setHintTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.edit_text_hint_color
+                )
+            )
         }
     }
 

@@ -11,13 +11,6 @@ import java.util.Date;
 public interface HighLight {
 
     /**
-     * Highlight action
-     */
-    enum HighLightAction {
-        NEW, DELETE, MODIFY
-    }
-
-    /**
      * <p> Returns Book id, which can be provided to intent to folio reader, if not provided id is
      * used from epub's dc:identifier field in metadata.
      * <p>for reference, look here:
@@ -71,4 +64,11 @@ public interface HighLight {
      * Returns Note linked to the highlight (optional)
      */
     String getNote();
+
+    /**
+     * Highlight action
+     */
+    enum HighLightAction {
+        NEW, DELETE, MODIFY
+    }
 }

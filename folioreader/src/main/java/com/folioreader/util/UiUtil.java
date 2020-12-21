@@ -26,12 +26,15 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.core.content.ContextCompat;
+
 import com.folioreader.AppContext;
 import com.folioreader.R;
 import com.folioreader.ui.view.UnderlinedTextView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,6 +48,7 @@ import java.util.Hashtable;
 public class UiUtil {
 
     private static final String LOG_TAG = UiUtil.class.getSimpleName();
+    private static final Hashtable<String, SoftReference<Typeface>> fontCache = new Hashtable<String, SoftReference<Typeface>>();
 
     public static void setCustomFont(View view, Context ctx, AttributeSet attrs,
                                      int[] attributeSet, int fontId) {
@@ -72,8 +76,6 @@ public class UiUtil {
 
         return true;
     }
-
-    private static final Hashtable<String, SoftReference<Typeface>> fontCache = new Hashtable<String, SoftReference<Typeface>>();
 
     public static Typeface getFont(Context c, String name) {
         synchronized (fontCache) {

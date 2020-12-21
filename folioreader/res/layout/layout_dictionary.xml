@@ -37,8 +37,8 @@
                 android:id="@+id/layout_header"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
                 android:background="@drawable/btn_contents_highlights"
                 android:orientation="horizontal"
                 android:padding="1.8dp">
@@ -95,8 +95,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:drawablePadding="8dp"
             android:drawableTop="@drawable/ic_offline_gray_layer_list"
+            android:drawablePadding="8dp"
             android:text="offline"
             android:visibility="gone"
             tools:visibility="visible" />

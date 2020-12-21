@@ -3,10 +3,13 @@ package com.folioreader.ui.adapter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+
 import com.folioreader.ui.fragment.FolioPageFragment;
+
 import org.readium.r2.shared.Link;
 
 import java.lang.reflect.Field;
@@ -33,6 +36,19 @@ public class FolioPageFragmentAdapter extends FragmentStatePagerAdapter {
         this.mEpubFileName = epubFileName;
         this.mBookId = bookId;
         fragments = new ArrayList<>(Arrays.asList(new Fragment[mSpineReferences.size()]));
+    }
+
+    public static Bundle getBundleFromSavedState(Fragment.SavedState savedState) {
+
+        Bundle bundle = null;
+        try {
+            Field field = Fragment.SavedState.class.getDeclaredField("mState");
+            field.setAccessible(true);
+            bundle = (Bundle) field.get(savedState);
+        } catch (Exception e) {
+            Log.v(LOG_TAG, "-> " + e);
+        }
+        return bundle;
     }
 
     @Override
@@ -81,19 +97,6 @@ public class FolioPageFragmentAdapter extends FragmentStatePagerAdapter {
         }
 
         return savedStateList;
-    }
-
-    public static Bundle getBundleFromSavedState(Fragment.SavedState savedState) {
-
-        Bundle bundle = null;
-        try {
-            Field field = Fragment.SavedState.class.getDeclaredField("mState");
-            field.setAccessible(true);
-            bundle = (Bundle) field.get(savedState);
-        } catch (Exception e) {
-            Log.v(LOG_TAG, "-> " + e);
-        }
-        return bundle;
     }
 
     @Override

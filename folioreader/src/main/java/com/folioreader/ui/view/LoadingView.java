@@ -7,8 +7,10 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.webkit.JavascriptInterface;
 import android.widget.ProgressBar;
+
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+
 import com.folioreader.Config;
 import com.folioreader.R;
 import com.folioreader.util.AppUtil;
@@ -17,18 +19,16 @@ import com.folioreader.util.UiUtil;
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class LoadingView extends ConstraintLayout {
 
+    private static final String LOG_TAG = LoadingView.class.getSimpleName();
     private ProgressBar progressBar;
     private int maxVisibleDuration = -1;
     private Handler handler;
-
     private Runnable hideRunnable = new Runnable() {
         @Override
         public void run() {
             hide();
         }
     };
-
-    private static final String LOG_TAG = LoadingView.class.getSimpleName();
 
     public LoadingView(Context context) {
         super(context);

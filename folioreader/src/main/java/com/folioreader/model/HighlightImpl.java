@@ -15,7 +15,17 @@ public class HighlightImpl implements Parcelable, HighLight {
 
     public static final String INTENT = HighlightImpl.class.getName();
     public static final String BROADCAST_EVENT = "highlight_broadcast_event";
+    public static final Creator<HighlightImpl> CREATOR = new Creator<HighlightImpl>() {
+        @Override
+        public HighlightImpl createFromParcel(Parcel in) {
+            return new HighlightImpl(in);
+        }
 
+        @Override
+        public HighlightImpl[] newArray(int size) {
+            return new HighlightImpl[size];
+        }
+    };
     /**
      * Database id
      */
@@ -58,54 +68,16 @@ public class HighlightImpl implements Parcelable, HighLight {
      * <p>for reference, look here: <a href="https://github.com/timdown/rangy">rangy</a>.</p>
      */
     private String rangy;
-
     /**
      * Unique identifier for a highlight for sync across devices.
      * <p>for reference, look here:
      * <a href = "https://docs.oracle.com/javase/7/docs/api/java/util/UUID.html#toString()">UUID</a>.</p>
      */
     private String uuid;
-
     /**
      * Note linked to the highlight (optional)
      */
     private String note;
-
-    public enum HighlightStyle {
-        Yellow,
-        Green,
-        Blue,
-        Pink,
-        Underline,
-        TextColor,
-        DottetUnderline,
-        Normal;
-
-        /**
-         * Return CSS class for HighlightStyle.
-         */
-        public static String classForStyle(HighlightStyle style) {
-            switch (style) {
-                case Yellow:
-                    return "highlight_yellow";
-                case Green:
-                    return "highlight_green";
-                case Blue:
-                    return "highlight_blue";
-                case Pink:
-                    return "highlight_pink";
-                case Underline:
-                    return "highlight_underline";
-                case DottetUnderline:
-                    return "mediaOverlayStyle1";
-                case TextColor:
-                    return "mediaOverlayStyle2";
-                default:
-                    return "mediaOverlayStyle0";
-
-            }
-        }
-    }
 
     public HighlightImpl(int id, String bookId, String content, Date date, String type,
                          int pageNumber, String pageId,
@@ -165,6 +137,10 @@ public class HighlightImpl implements Parcelable, HighLight {
         return type;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getPageId() {
         return pageId;
     }
@@ -181,10 +157,6 @@ public class HighlightImpl implements Parcelable, HighLight {
         this.rangy = rangy;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public int getPageNumber() {
         return pageNumber;
     }
@@ -197,16 +169,16 @@ public class HighlightImpl implements Parcelable, HighLight {
         return note;
     }
 
+    public void setNote(String note) {
+        this.note = note;
+    }
+
     public String getUUID() {
         return uuid;
     }
 
     public void setUUID(String uuid) {
         this.uuid = uuid;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
     }
 
     @Override
@@ -281,15 +253,39 @@ public class HighlightImpl implements Parcelable, HighLight {
         uuid = in.readString();
     }
 
-    public static final Creator<HighlightImpl> CREATOR = new Creator<HighlightImpl>() {
-        @Override
-        public HighlightImpl createFromParcel(Parcel in) {
-            return new HighlightImpl(in);
-        }
+    public enum HighlightStyle {
+        Yellow,
+        Green,
+        Blue,
+        Pink,
+        Underline,
+        TextColor,
+        DottetUnderline,
+        Normal;
 
-        @Override
-        public HighlightImpl[] newArray(int size) {
-            return new HighlightImpl[size];
+        /**
+         * Return CSS class for HighlightStyle.
+         */
+        public static String classForStyle(HighlightStyle style) {
+            switch (style) {
+                case Yellow:
+                    return "highlight_yellow";
+                case Green:
+                    return "highlight_green";
+                case Blue:
+                    return "highlight_blue";
+                case Pink:
+                    return "highlight_pink";
+                case Underline:
+                    return "highlight_underline";
+                case DottetUnderline:
+                    return "mediaOverlayStyle1";
+                case TextColor:
+                    return "mediaOverlayStyle2";
+                default:
+                    return "mediaOverlayStyle0";
+
+            }
         }
-    };
+    }
 }

@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.folioreader.Config;
 import com.folioreader.R;
 import com.folioreader.model.TOCLinkWrapper;
@@ -24,9 +26,8 @@ import java.util.ArrayList;
 public class TOCAdapter extends MultiLevelExpIndListAdapter {
 
     private static final int LEVEL_ONE_PADDING_PIXEL = 15;
-
-    private TOCCallback callback;
     private final Context mContext;
+    private TOCCallback callback;
     private String selectedHref;
     private Config mConfig;
 
@@ -35,6 +36,13 @@ public class TOCAdapter extends MultiLevelExpIndListAdapter {
         mContext = context;
         this.selectedHref = selectedHref;
         this.mConfig = config;
+    }
+
+    private static int getPaddingPixels(Context context, int dpValue) {
+        // Get the screen's density scale
+        final float scale = context.getResources().getDisplayMetrics().density;
+        // Convert the dps to pixels, based on density scale
+        return (int) (dpValue * scale + 0.5f);
     }
 
     public void setCallback(TOCCallback callback) {
@@ -149,12 +157,5 @@ public class TOCAdapter extends MultiLevelExpIndListAdapter {
                 }
             });
         }
-    }
-
-    private static int getPaddingPixels(Context context, int dpValue) {
-        // Get the screen's density scale
-        final float scale = context.getResources().getDisplayMetrics().density;
-        // Convert the dps to pixels, based on density scale
-        return (int) (dpValue * scale + 0.5f);
     }
 }

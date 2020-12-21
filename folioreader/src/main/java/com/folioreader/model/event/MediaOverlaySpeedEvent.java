@@ -6,10 +6,6 @@ package com.folioreader.model.event;
 
 public class MediaOverlaySpeedEvent {
 
-    public enum Speed {
-        HALF, ONE, ONE_HALF, TWO,
-    }
-
     private Speed speed;
 
     public MediaOverlaySpeedEvent(Speed speed) {
@@ -18,5 +14,9 @@ public class MediaOverlaySpeedEvent {
 
     public Speed getSpeed() {
         return speed;
+    }
+
+    public enum Speed {
+        HALF, ONE, ONE_HALF, TWO,
     }
 }

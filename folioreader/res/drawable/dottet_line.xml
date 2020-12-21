@@ -3,10 +3,10 @@
         <shape android:shape="line">
             <solid android:color="#ffffff" />
             <stroke
-                android:dashGap="5dp"
-                android:dashWidth="5dp"
                 android:width="1dp"
-                android:color="@color/black" />
+                android:color="@color/black"
+                android:dashWidth="5dp"
+                android:dashGap="5dp" />
             <!--<padding
                 android:top="35dp" />-->
         </shape>

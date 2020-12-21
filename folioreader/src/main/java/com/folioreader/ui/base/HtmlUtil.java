@@ -1,6 +1,7 @@
 package com.folioreader.ui.base;
 
 import android.content.Context;
+
 import com.folioreader.Config;
 import com.folioreader.Constants;
 import com.folioreader.R;

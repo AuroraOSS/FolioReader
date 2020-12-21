@@ -5,10 +5,6 @@ package com.folioreader.model.event;
  */
 
 public class MediaOverlayHighlightStyleEvent {
-    public enum Style {
-        UNDERLINE, BACKGROUND, DEFAULT,
-    }
-
     private Style style;
 
     public MediaOverlayHighlightStyleEvent(Style style) {
@@ -17,5 +13,9 @@ public class MediaOverlayHighlightStyleEvent {
 
     public Style getStyle() {
         return style;
+    }
+
+    public enum Style {
+        UNDERLINE, BACKGROUND, DEFAULT,
     }
 }

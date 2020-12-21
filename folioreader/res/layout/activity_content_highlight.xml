@@ -38,8 +38,8 @@
                 android:id="@+id/layout_content_highlights"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
                 android:orientation="horizontal"
                 android:padding="1.8dp">
 

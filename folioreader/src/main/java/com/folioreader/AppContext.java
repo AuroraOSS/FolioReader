@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -15,15 +16,15 @@ public class AppContext extends ContentProvider {
     @SuppressLint("StaticFieldLeak")
     private static Context context;
 
+    public static Context get() {
+        return context;
+    }
+
     @Override
     public boolean onCreate() {
         Log.v("AppContext", "-> onCreate");
         context = getContext();
         return true;
-    }
-
-    public static Context get() {
-        return context;
     }
 
     @Nullable

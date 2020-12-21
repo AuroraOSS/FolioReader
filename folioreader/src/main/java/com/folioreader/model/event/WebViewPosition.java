@@ -8,13 +8,13 @@ public class WebViewPosition {
     private String href;
     private String highlightId;
 
-    public String getHref() {
-        return href;
-    }
-
     public WebViewPosition(String href, String highlightId) {
         this.href = href;
         this.highlightId = highlightId;
+    }
+
+    public String getHref() {
+        return href;
     }
 
     public void setHref(String href) {

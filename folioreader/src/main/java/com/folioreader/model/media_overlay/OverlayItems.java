@@ -8,6 +8,17 @@ import android.os.Parcelable;
  */
 
 public class OverlayItems implements Parcelable {
+    public static final Creator<OverlayItems> CREATOR = new Creator<OverlayItems>() {
+        @Override
+        public OverlayItems createFromParcel(Parcel in) {
+            return new OverlayItems(in);
+        }
+
+        @Override
+        public OverlayItems[] newArray(int size) {
+            return new OverlayItems[size];
+        }
+    };
     private String id;
     private String tag;
     private String classType;
@@ -43,18 +54,6 @@ public class OverlayItems implements Parcelable {
         text = in.readString();
     }
 
-    public static final Creator<OverlayItems> CREATOR = new Creator<OverlayItems>() {
-        @Override
-        public OverlayItems createFromParcel(Parcel in) {
-            return new OverlayItems(in);
-        }
-
-        @Override
-        public OverlayItems[] newArray(int size) {
-            return new OverlayItems[size];
-        }
-    };
-
     @Override
     public String toString() {
         return "OverlayItems{" +
@@ -78,16 +77,16 @@ public class OverlayItems implements Parcelable {
         return spineHref;
     }
 
+    public void setSpineHref(String spineHref) {
+        this.spineHref = spineHref;
+    }
+
     public String getText() {
         return text;
     }
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public void setSpineHref(String spineHref) {
-        this.spineHref = spineHref;
     }
 
     @Override

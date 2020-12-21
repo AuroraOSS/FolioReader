@@ -5,10 +5,16 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.folioreader.Config;
 import com.folioreader.R;
 import com.folioreader.model.HighlightImpl;
@@ -141,6 +147,14 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         notifyDataSetChanged();
     }
 
+    public interface HighLightAdapterCallback {
+        void onItemClick(HighlightImpl highlightImpl);
+
+        void deleteHighlight(int id);
+
+        void editNote(HighlightImpl highlightImpl, int position);
+    }
+
     static class HighlightHolder extends RecyclerView.ViewHolder {
         private UnderlinedTextView content;
         private ImageView delete, editNote;
@@ -159,13 +173,5 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             date = (TextView) itemView.findViewById(R.id.tv_highlight_date);
             note = (TextView) itemView.findViewById(R.id.tv_note);
         }
-    }
-
-    public interface HighLightAdapterCallback {
-        void onItemClick(HighlightImpl highlightImpl);
-
-        void deleteHighlight(int id);
-
-        void editNote(HighlightImpl highlightImpl, int position);
     }
 }

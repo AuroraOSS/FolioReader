@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Parcelable;
+
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.folioreader.model.HighLight;
 import com.folioreader.model.HighlightImpl;
 import com.folioreader.model.locators.ReadLocator;
@@ -19,13 +21,14 @@ import com.folioreader.ui.base.OnSaveHighlight;
 import com.folioreader.ui.base.SaveReceivedHighlightTask;
 import com.folioreader.util.OnHighlightListener;
 import com.folioreader.util.ReadLocatorListener;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by avez raj on 9/13/2017.
@@ -33,16 +36,18 @@ import java.util.concurrent.TimeUnit;
 
 public class FolioReader {
 
-    @SuppressLint("StaticFieldLeak")
-    private static FolioReader singleton = null;
-
     public static final String EXTRA_BOOK_ID = "com.folioreader.extra.BOOK_ID";
     public static final String EXTRA_READ_LOCATOR = "com.folioreader.extra.READ_LOCATOR";
     public static final String EXTRA_PORT_NUMBER = "com.folioreader.extra.PORT_NUMBER";
     public static final String ACTION_SAVE_READ_LOCATOR = "com.folioreader.action.SAVE_READ_LOCATOR";
     public static final String ACTION_CLOSE_FOLIOREADER = "com.folioreader.action.CLOSE_FOLIOREADER";
     public static final String ACTION_FOLIOREADER_CLOSED = "com.folioreader.action.FOLIOREADER_CLOSED";
-
+    @SuppressLint("StaticFieldLeak")
+    private static FolioReader singleton = null;
+    @Nullable
+    public Retrofit retrofit;
+    @Nullable
+    public R2StreamerApi r2StreamerApi;
     private Context context;
     private Config config;
     private boolean overrideConfig;
@@ -51,22 +56,6 @@ public class FolioReader {
     private ReadLocatorListener readLocatorListener;
     private OnClosedListener onClosedListener;
     private ReadLocator readLocator;
-
-    @Nullable
-    public Retrofit retrofit;
-    @Nullable
-    public R2StreamerApi r2StreamerApi;
-
-    public interface OnClosedListener {
-        /**
-         * You may call {@link FolioReader#clear()} in this method, if you wouldn't require to open
-         * an epub again from the current activity.
-         * Or you may call {@link FolioReader#stop()} in this method, if you wouldn't require to open
-         * an epub again from your application.
-         */
-        void onFolioReaderClosed();
-    }
-
     private BroadcastReceiver highlightReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -78,7 +67,6 @@ public class FolioReader {
             }
         }
     };
-
     private BroadcastReceiver readLocatorReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -89,7 +77,6 @@ public class FolioReader {
                 readLocatorListener.saveReadLocator(readLocator);
         }
     };
-
     private BroadcastReceiver closedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -97,6 +84,22 @@ public class FolioReader {
                 onClosedListener.onFolioReaderClosed();
         }
     };
+
+    private FolioReader() {
+    }
+
+    private FolioReader(Context context) {
+        this.context = context;
+        DbAdapter.initialize(context);
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
+        localBroadcastManager.registerReceiver(highlightReceiver,
+                new IntentFilter(HighlightImpl.BROADCAST_EVENT));
+        localBroadcastManager.registerReceiver(readLocatorReceiver,
+                new IntentFilter(ACTION_SAVE_READ_LOCATOR));
+        localBroadcastManager.registerReceiver(closedReceiver,
+                new IntentFilter(ACTION_FOLIOREADER_CLOSED));
+    }
 
     public static FolioReader get() {
 
@@ -113,20 +116,56 @@ public class FolioReader {
         return singleton;
     }
 
-    private FolioReader() {
+    public static void initRetrofit(String streamerUrl) {
+
+        if (singleton == null || singleton.retrofit != null)
+            return;
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(1, TimeUnit.MINUTES)
+                .writeTimeout(1, TimeUnit.MINUTES)
+                .build();
+
+        singleton.retrofit = new Retrofit.Builder()
+                .baseUrl(streamerUrl)
+                .addConverterFactory(new QualifiedTypeConverterFactory(
+                        JacksonConverterFactory.create(),
+                        GsonConverterFactory.create()))
+                .client(client)
+                .build();
+
+        singleton.r2StreamerApi = singleton.retrofit.create(R2StreamerApi.class);
     }
 
-    private FolioReader(Context context) {
-        this.context = context;
-        DbAdapter.initialize(context);
+    /**
+     * Nullifies readLocator and listeners.
+     * This method ideally should be used in onDestroy() of Activity or Fragment.
+     * Use this method if you want to use FolioReader singleton instance again in the application,
+     * else use {@link #stop()} which destruct the FolioReader singleton instance.
+     */
+    public static synchronized void clear() {
 
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
-        localBroadcastManager.registerReceiver(highlightReceiver,
-                new IntentFilter(HighlightImpl.BROADCAST_EVENT));
-        localBroadcastManager.registerReceiver(readLocatorReceiver,
-                new IntentFilter(ACTION_SAVE_READ_LOCATOR));
-        localBroadcastManager.registerReceiver(closedReceiver,
-                new IntentFilter(ACTION_FOLIOREADER_CLOSED));
+        if (singleton != null) {
+            singleton.readLocator = null;
+            singleton.onHighlightListener = null;
+            singleton.readLocatorListener = null;
+            singleton.onClosedListener = null;
+        }
+    }
+
+    /**
+     * Destructs the FolioReader singleton instance.
+     * Use this method only if you are sure that you won't need to use
+     * FolioReader singleton instance again in application, else use {@link #clear()}.
+     */
+    public static synchronized void stop() {
+
+        if (singleton != null) {
+            DbAdapter.terminate();
+            singleton.unregisterListeners();
+            singleton = null;
+        }
     }
 
     public FolioReader openBook(String assetOrSdcardPath) {
@@ -200,28 +239,6 @@ public class FolioReader {
         return singleton;
     }
 
-    public static void initRetrofit(String streamerUrl) {
-
-        if (singleton == null || singleton.retrofit != null)
-            return;
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(1, TimeUnit.MINUTES)
-                .readTimeout(1, TimeUnit.MINUTES)
-                .writeTimeout(1, TimeUnit.MINUTES)
-                .build();
-
-        singleton.retrofit = new Retrofit.Builder()
-                .baseUrl(streamerUrl)
-                .addConverterFactory(new QualifiedTypeConverterFactory(
-                        JacksonConverterFactory.create(),
-                        GsonConverterFactory.create()))
-                .client(client)
-                .build();
-
-        singleton.r2StreamerApi = singleton.retrofit.create(R2StreamerApi.class);
-    }
-
     public FolioReader setOnHighlightListener(OnHighlightListener onHighlightListener) {
         this.onHighlightListener = onHighlightListener;
         return singleton;
@@ -259,40 +276,20 @@ public class FolioReader {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    /**
-     * Nullifies readLocator and listeners.
-     * This method ideally should be used in onDestroy() of Activity or Fragment.
-     * Use this method if you want to use FolioReader singleton instance again in the application,
-     * else use {@link #stop()} which destruct the FolioReader singleton instance.
-     */
-    public static synchronized void clear() {
-
-        if (singleton != null) {
-            singleton.readLocator = null;
-            singleton.onHighlightListener = null;
-            singleton.readLocatorListener = null;
-            singleton.onClosedListener = null;
-        }
-    }
-
-    /**
-     * Destructs the FolioReader singleton instance.
-     * Use this method only if you are sure that you won't need to use
-     * FolioReader singleton instance again in application, else use {@link #clear()}.
-     */
-    public static synchronized void stop() {
-
-        if (singleton != null) {
-            DbAdapter.terminate();
-            singleton.unregisterListeners();
-            singleton = null;
-        }
-    }
-
     private void unregisterListeners() {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
         localBroadcastManager.unregisterReceiver(highlightReceiver);
         localBroadcastManager.unregisterReceiver(readLocatorReceiver);
         localBroadcastManager.unregisterReceiver(closedReceiver);
+    }
+
+    public interface OnClosedListener {
+        /**
+         * You may call {@link FolioReader#clear()} in this method, if you wouldn't require to open
+         * an epub again from the current activity.
+         * Or you may call {@link FolioReader#stop()} in this method, if you wouldn't require to open
+         * an epub again from your application.
+         */
+        void onFolioReaderClosed();
     }
 }
