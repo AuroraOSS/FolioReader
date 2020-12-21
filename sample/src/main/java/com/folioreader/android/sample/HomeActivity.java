@@ -105,7 +105,8 @@ public class HomeActivity extends AppCompatActivity
      * On success, you can save highlights to FolioReader DB.
      */
     private void getHighlightsAndSave() {
-        new Thread(new Runnable() {
+        //TODO:Check this out
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 ArrayList<HighLight> highlightList = null;
@@ -128,7 +129,7 @@ public class HomeActivity extends AppCompatActivity
                     });
                 }
             }
-        }).start();
+        }).start();*/
     }
 
     private String loadAssetTextAsString(String name) {
