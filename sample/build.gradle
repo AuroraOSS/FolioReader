@@ -52,6 +52,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$versions.appcompat"
     implementation "androidx.constraintlayout:constraintlayout:$versions.constraintLayout"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation "androidx.test.ext:junit:1.1.1"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -63,12 +64,4 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:$versions.jackson"
     implementation "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$versions.jackson"
-
-    //progressBar error solve
-    configurations.matching { it.name == '_internal_aapt2_binary' }.all { config ->
-        config.resolutionStrategy.eachDependency { details ->
-            details.useVersion("3.3.2-5309881")
-        }
-    }
-
 }
