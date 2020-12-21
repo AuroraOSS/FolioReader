@@ -51,7 +51,9 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:$versions.appcompat"
     implementation "androidx.constraintlayout:constraintlayout:$versions.constraintLayout"
+    implementation "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle"
     implementation "androidx.recyclerview:recyclerview:$versions.recyclerview"
+
     implementation "com.google.android.material:material:$versions.material"
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
 
@@ -84,9 +86,6 @@ dependencies {
 
     // Only ReflectionUtils in Spring framework is used
     implementation 'org.springframework:spring-core:4.3.19.RELEASE'
-
-    // Lifecycle
-    implementation "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle"
 
     testImplementation 'junit:junit:4.13.1'
 }
