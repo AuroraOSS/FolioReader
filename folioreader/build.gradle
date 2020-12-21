@@ -54,7 +54,6 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$versions.recyclerview"
     implementation "com.google.android.material:material:$versions.material"
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-    testImplementation 'junit:junit:4.12'
 
     implementation 'org.slf4j:slf4j-android:1.7.25'
     implementation 'com.daimajia.swipelayout:library:1.2.0@aar'
@@ -88,4 +87,6 @@ dependencies {
 
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle"
+
+    testImplementation 'junit:junit:4.13.1'
 }
